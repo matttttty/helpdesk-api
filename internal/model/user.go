@@ -11,10 +11,10 @@ const (
 )
 
 type User struct {
-	ID        int64     `json:"id"`
-	Username  string    `json:"username"`
-	Password  string    `json:"-"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created"`
-	Role      Role      `json:"role"`
+	ID        int64     `json:"id" db:"id"`
+	Name      string    `json:"name" db:"name"`
+	Password  string    `json:"-" db:"password"`
+	Email     string    `json:"email" db:"email"`
+	CreatedAt time.Time `json:"created" db:"created_at"`
+	Role      Role      `json:"role" db:"role"`
 }

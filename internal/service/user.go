@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"helpdesk-api/internal/model"
 	"helpdesk-api/internal/repository"
+	"helpdesk-api/pkg/middleware"
 )
 
 type UserService struct {
@@ -49,5 +50,9 @@ func (s *UserService) Login(ctx context.Context, email, password string) (string
 		return "", errors.New("invalid password")
 	}
 
-	return "token", nil
+	token, err := middleware.GenerateToken(user.ID, string(user.Role))
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }

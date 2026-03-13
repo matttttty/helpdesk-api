@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"helpdesk-api/internal/handler"
 	"helpdesk-api/internal/repository"
+	"helpdesk-api/internal/service"
 	"log"
+	"net/http"
 )
 
 func main() {
@@ -21,4 +24,11 @@ func main() {
 
 	defer db.Close()
 	fmt.Println("Connected to database", db.Stats())
+
+	h := handler.NewAuthHandler(service.NewUserService(repository.NewUserRepository(db)))
+	router := handler.NewRouter(h)
+	if err := http.ListenAndServe(":8080", router); err != nil {
+		log.Fatal(err)
+	}
+
 }

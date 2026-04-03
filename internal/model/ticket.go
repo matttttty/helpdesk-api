@@ -25,7 +25,7 @@ type Ticket struct {
 	Description string    `json:"description" db:"description"`
 	Status      Status    `json:"status" db:"status"`
 	Priority    Priority  `json:"priority" db:"priority"`
-	AuthorId    int64     `json:"author_id" db:"author_id"`
+	AuthorID    int64     `json:"author_id" db:"author_id"`
 	AssigneeID  *int64    `json:"assignee_id" db:"assignee_id"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`

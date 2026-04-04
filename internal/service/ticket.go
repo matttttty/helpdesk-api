@@ -7,15 +7,15 @@ import (
 	"helpdesk-api/internal/repository"
 )
 
-type ticketService struct {
+type TicketService struct {
 	repo *repository.TicketRepository
 }
 
-func NewTicketService(repo *repository.TicketRepository) *ticketService {
-	return &ticketService{repo: repo}
+func NewTicketService(repo *repository.TicketRepository) *TicketService {
+	return &TicketService{repo: repo}
 }
 
-func (s *ticketService) CreateTicket(ctx context.Context, ticket *model.Ticket) error {
+func (s *TicketService) CreateTicket(ctx context.Context, ticket *model.Ticket) error {
 	if ticket.Title == "" {
 		return errors.New("title is required")
 	}
@@ -28,31 +28,31 @@ func (s *ticketService) CreateTicket(ctx context.Context, ticket *model.Ticket) 
 	return s.repo.CreateTicket(ctx, ticket)
 }
 
-func (s *ticketService) GetTicketByID(ctx context.Context, id int64) (*model.Ticket, error) {
+func (s *TicketService) GetTicketByID(ctx context.Context, id int64) (*model.Ticket, error) {
 
 	return s.repo.GetTicketByID(ctx, id)
 
 }
 
-func (s *ticketService) GetAllTickets(ctx context.Context) ([]*model.Ticket, error) {
+func (s *TicketService) GetAllTickets(ctx context.Context) ([]*model.Ticket, error) {
 
 	return s.repo.GetAllTickets(ctx)
 
 }
 
-func (s *ticketService) GetTicketsByAuthorID(ctx context.Context, AuthorID int64) ([]*model.Ticket, error) {
+func (s *TicketService) GetTicketsByAuthorID(ctx context.Context, AuthorID int64) ([]*model.Ticket, error) {
 
 	return s.repo.GetTicketsByAuthorID(ctx, AuthorID)
 
 }
 
-func (s *ticketService) UpdateTicket(ctx context.Context, ticket *model.Ticket) error {
+func (s *TicketService) UpdateTicket(ctx context.Context, ticket *model.Ticket) error {
 
 	return s.repo.UpdateTicket(ctx, ticket)
 
 }
 
-func (s *ticketService) DeleteTicket(ctx context.Context, id int64) error {
+func (s *TicketService) DeleteTicket(ctx context.Context, id int64) error {
 
 	return s.repo.DeleteTicket(ctx, id)
 

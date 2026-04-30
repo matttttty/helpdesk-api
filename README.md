@@ -1,7 +1,7 @@
 # Helpdesk API
 
 A REST API for a helpdesk support system built with Go.
-
+> ⚠️ This project is currently under active development. Some features may be incomplete or subject to change.
 ## Tech Stack
 
 - **Go** - primary language

@@ -12,7 +12,7 @@ import (
 
 func main() {
 
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load("../../.env"); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
@@ -25,8 +25,9 @@ func main() {
 	defer db.Close()
 	fmt.Println("Connected to database", db.Stats())
 
-	h := handler.NewAuthHandler(service.NewUserService(repository.NewUserRepository(db)))
-	router := handler.NewRouter(h)
+	authHandler := handler.NewAuthHandler(service.NewUserService(repository.NewUserRepository(db)))
+	ticketHandler := handler.NewTicketHandler(service.NewTicketService(repository.NewTicketRepository(db)))
+	router := handler.NewRouter(authHandler, ticketHandler)
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		log.Fatal(err)
 	}

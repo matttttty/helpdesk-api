@@ -52,8 +52,10 @@ func (s *TicketService) UpdateTicket(ctx context.Context, ticket *model.Ticket) 
 
 }
 
-func (s *TicketService) DeleteTicket(ctx context.Context, id int64) error {
-
+func (s *TicketService) DeleteTicket(ctx context.Context, id int64, role model.Role) error {
+	if role != model.RoleAdmin {
+		return errors.New("access denied")
+	}
 	return s.repo.DeleteTicket(ctx, id)
 
 }

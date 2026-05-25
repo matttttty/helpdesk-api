@@ -13,9 +13,23 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+var jwtSecret []byte
+
+func LoadJWTSecret() error {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		return fmt.Errorf("JWT_SECRET environment variable is required")
+	}
+	if len(secret) < 32 {
+		return fmt.Errorf("JWT_SECRET must be at least 32 characters (got %d)", len(secret))
+	}
+	jwtSecret = []byte(secret)
+	return nil
+}
+
 func GenerateToken(userID int64, role string) (string, error) {
 
-	secret := []byte(os.Getenv("JWT_SECRET"))
+	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
 
 	// Create claims with multiple fields populated
 	claims := Claims{
@@ -29,7 +43,7 @@ func GenerateToken(userID int64, role string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(secret)
+	ss, err := token.SignedString(jwtSecret)
 	if err != nil {
 		return "", err
 	}
@@ -39,13 +53,13 @@ func GenerateToken(userID int64, role string) (string, error) {
 
 func ValidateToken(tokenString string) (*Claims, error) {
 
-	secret := []byte(os.Getenv("JWT_SECRET"))
+	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
 
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return secret, nil
+		return jwtSecret, nil
 	})
 	if err != nil {
 		return nil, err

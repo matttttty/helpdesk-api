@@ -6,7 +6,7 @@ import (
 	"helpdesk-api/pkg/middleware"
 )
 
-func NewRouter(authHandler *AuthHandler) *chi.Mux {
+func NewRouter(authHandler *AuthHandler, ticketHandler *TicketHandler) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(chiMiddleware.RealIP)
@@ -18,6 +18,13 @@ func NewRouter(authHandler *AuthHandler) *chi.Mux {
 
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.AuthMiddleware)
+		r.Route("/tickets", func(r chi.Router) {
+			r.Get("/", ticketHandler.GetAllTickets)
+			r.Post("/", ticketHandler.CreateTicket)
+			r.Get("/{id}", ticketHandler.GetTicketByID)
+			r.Put("/{id}", ticketHandler.UpdateTicket)
+			r.Delete("/{id}", ticketHandler.DeleteTicket)
+		})
 	})
 
 	return r

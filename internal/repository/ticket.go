@@ -49,7 +49,7 @@ func (r *TicketRepository) GetAllTickets(ctx context.Context) ([]*model.Ticket, 
 
 	query := `SELECT id, title, description, status, priority, author_id, assignee_id, created_at, updated_at FROM tickets`
 
-	tikests := []*model.Ticket{}
+	tickets := []*model.Ticket{}
 
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
@@ -65,7 +65,7 @@ func (r *TicketRepository) GetAllTickets(ctx context.Context) ([]*model.Ticket, 
 		); err != nil {
 			return nil, fmt.Errorf("GetAllTickets: %w", err)
 		}
-		tikests = append(tikests, ticket)
+		tickets = append(tickets, ticket)
 	}
 	rerr := rows.Close()
 	if rerr != nil {
@@ -76,7 +76,7 @@ func (r *TicketRepository) GetAllTickets(ctx context.Context) ([]*model.Ticket, 
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("GetAllTickets: %w", err)
 	}
-	return tikests, nil
+	return tickets, nil
 }
 
 func (r *TicketRepository) GetTicketsByAuthorID(ctx context.Context, AuthorID int64) ([]*model.Ticket, error) {

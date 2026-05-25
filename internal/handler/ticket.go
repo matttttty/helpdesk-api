@@ -44,7 +44,7 @@ func (s *TicketHandler) CreateTicket(w http.ResponseWriter, r *http.Request) {
 
 	err = s.ticketService.CreateTicket(r.Context(), &ticket)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writeError(w, http.StatusBadRequest, "recheck the fields content", nil)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -55,7 +55,7 @@ func (s *TicketHandler) CreateTicket(w http.ResponseWriter, r *http.Request) {
 func (h *TicketHandler) GetAllTickets(w http.ResponseWriter, r *http.Request) {
 	ticket, err := h.ticketService.GetAllTickets(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to fetch the tickets", err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -72,7 +72,7 @@ func (h *TicketHandler) GetTicketByID(w http.ResponseWriter, r *http.Request) {
 	}
 	ticket, err := h.ticketService.GetTicketByID(r.Context(), id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to fetch the ticket", err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -96,7 +96,7 @@ func (h *TicketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	ticket.ID = id
 	err = h.ticketService.UpdateTicket(r.Context(), ticket)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to update ticket", err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -118,7 +118,7 @@ func (h *TicketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 	}
 	err = h.ticketService.DeleteTicket(r.Context(), id, model.Role(claims.Role))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to delete ticket", err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

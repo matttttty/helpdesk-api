@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/lib/pq"
 
 	//"database/sql"
 	"golang.org/x/crypto/bcrypt"
@@ -10,6 +11,8 @@ import (
 	"helpdesk-api/internal/repository"
 	"helpdesk-api/pkg/middleware"
 )
+
+const pgUniqueViolationCode = "23505"
 
 type UserService struct {
 	repo *repository.UserRepository
@@ -29,6 +32,10 @@ func (s *UserService) Register(ctx context.Context, user *model.User) error {
 		user.Role = model.RoleClient
 	}
 	if err = s.repo.CreateUser(ctx, user); err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code == pgUniqueViolationCode {
+			return ErrEmailAlreadyExists
+		}
 		return err
 	}
 
@@ -42,12 +49,13 @@ func (s *UserService) Login(ctx context.Context, email, password string) (string
 		return "", err
 	}
 	if user == nil {
-		return "", errors.New("user not found")
+		return "", ErrInvalidCredentials
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return "", errors.New("invalid password")
+
+		return "", ErrInvalidCredentials
 	}
 
 	token, err := middleware.GenerateToken(user.ID, string(user.Role))

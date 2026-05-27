@@ -1,10 +1,11 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
-	"os"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type Claims struct {
@@ -15,21 +16,15 @@ type Claims struct {
 
 var jwtSecret []byte
 
-func LoadJWTSecret() error {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		return fmt.Errorf("JWT_SECRET environment variable is required")
-	}
-	if len(secret) < 32 {
-		return fmt.Errorf("JWT_SECRET must be at least 32 characters (got %d)", len(secret))
-	}
+func LoadJWTSecret(secret string) {
 	jwtSecret = []byte(secret)
-	return nil
 }
 
 func GenerateToken(userID int64, role string) (string, error) {
 
-	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
+	if len(jwtSecret) == 0 {
+		return "", errors.New("jwt secret is not loaded; call LoadJWTSecret first")
+	}
 
 	// Create claims with multiple fields populated
 	claims := Claims{
@@ -53,7 +48,9 @@ func GenerateToken(userID int64, role string) (string, error) {
 
 func ValidateToken(tokenString string) (*Claims, error) {
 
-	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
+	if len(jwtSecret) == 0 {
+		return nil, errors.New("jwt secret is not loaded; call LoadJWTSecret first")
+	}
 
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

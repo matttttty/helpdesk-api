@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"helpdesk-api/internal/model"
 )
@@ -31,7 +32,7 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 	query := `SELECT id, name, email, password, role, created_at FROM users WHERE email = $1`
 	user := &model.User{}
 	err := r.db.QueryRowContext(ctx, query, email).Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Role, &user.CreatedAt)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {

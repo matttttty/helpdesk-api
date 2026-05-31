@@ -2,22 +2,29 @@ package service
 
 import (
 	"context"
-	"errors"
 	"helpdesk-api/internal/model"
-	"helpdesk-api/internal/repository"
 )
 
-type TicketService struct {
-	repo *repository.TicketRepository
+type TicketRepo interface {
+	CreateTicket(ctx context.Context, ticket *model.Ticket) error
+	GetTicketByID(ctx context.Context, id int64) (*model.Ticket, error)
+	GetAllTickets(ctx context.Context) ([]*model.Ticket, error)
+	GetTicketsByAuthorID(ctx context.Context, AuthorID int64) ([]*model.Ticket, error)
+	UpdateTicket(ctx context.Context, ticket *model.Ticket) error
+	DeleteTicket(ctx context.Context, id int64) error
 }
 
-func NewTicketService(repo *repository.TicketRepository) *TicketService {
+type TicketService struct {
+	repo TicketRepo
+}
+
+func NewTicketService(repo TicketRepo) *TicketService {
 	return &TicketService{repo: repo}
 }
 
 func (s *TicketService) CreateTicket(ctx context.Context, ticket *model.Ticket) error {
 	if ticket.Title == "" {
-		return errors.New("title is required")
+		return ErrTitleRequired
 	}
 	if ticket.Status == "" {
 		ticket.Status = model.StatusOpen
@@ -54,7 +61,7 @@ func (s *TicketService) UpdateTicket(ctx context.Context, ticket *model.Ticket) 
 
 func (s *TicketService) DeleteTicket(ctx context.Context, id int64, role model.Role) error {
 	if role != model.RoleAdmin {
-		return errors.New("access denied")
+		return ErrAccessDenied
 	}
 	return s.repo.DeleteTicket(ctx, id)
 

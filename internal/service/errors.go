@@ -7,4 +7,5 @@ var (
 	ErrEmailAlreadyExists = errors.New("email already exists")
 	ErrTicketNotFound     = errors.New("ticket not found")
 	ErrAccessDenied       = errors.New("access denied")
+	ErrTitleRequired      = errors.New("title is reqiered")
 )

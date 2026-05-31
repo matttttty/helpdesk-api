@@ -3,22 +3,28 @@ package service
 import (
 	"context"
 	"errors"
+
 	"github.com/lib/pq"
 
-	//"database/sql"
-	"golang.org/x/crypto/bcrypt"
 	"helpdesk-api/internal/model"
-	"helpdesk-api/internal/repository"
 	"helpdesk-api/pkg/middleware"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 const pgUniqueViolationCode = "23505"
 
-type UserService struct {
-	repo *repository.UserRepository
+type UserRepo interface {
+	CreateUser(ctx context.Context, user *model.User) error
+	GetUserByEmail(ctx context.Context, email string) (*model.User, error)
+	GetUserByID(ctx context.Context, id int64) (*model.User, error)
 }
 
-func NewUserService(repo *repository.UserRepository) *UserService {
+type UserService struct {
+	repo UserRepo
+}
+
+func NewUserService(repo UserRepo) *UserService {
 	return &UserService{repo: repo}
 }
 

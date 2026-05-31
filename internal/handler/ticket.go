@@ -2,12 +2,13 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/go-chi/chi/v5"
 	"helpdesk-api/internal/model"
 	"helpdesk-api/internal/service"
 	"helpdesk-api/pkg/middleware"
 	"net/http"
 	"strconv"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type TicketHandler struct {
@@ -19,7 +20,7 @@ func NewTicketHandler(service *service.TicketService) *TicketHandler {
 }
 
 func (s *TicketHandler) CreateTicket(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	var ticket model.Ticket
 	err := json.NewDecoder(r.Body).Decode(&ticket)
 	if err != nil {
@@ -47,9 +48,8 @@ func (s *TicketHandler) CreateTicket(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "recheck the fields content", nil)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(ticket)
+
+	writeJSON(w, http.StatusCreated, ticket)
 }
 
 func (h *TicketHandler) GetAllTickets(w http.ResponseWriter, r *http.Request) {
@@ -58,9 +58,8 @@ func (h *TicketHandler) GetAllTickets(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "failed to fetch the tickets", err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(ticket)
+
+	writeJSON(w, http.StatusOK, ticket)
 }
 
 func (h *TicketHandler) GetTicketByID(w http.ResponseWriter, r *http.Request) {
@@ -75,9 +74,8 @@ func (h *TicketHandler) GetTicketByID(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "failed to fetch the ticket", err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(ticket)
+
+	writeJSON(w, http.StatusOK, ticket)
 }
 
 func (h *TicketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
@@ -99,9 +97,8 @@ func (h *TicketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "failed to update ticket", err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(ticket)
+
+	writeJSON(w, http.StatusOK, ticket)
 }
 
 func (h *TicketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +118,6 @@ func (h *TicketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "failed to delete ticket", err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Ticket deleted")
+
+	writeJSON(w, http.StatusOK, "Ticket deleted")
 }

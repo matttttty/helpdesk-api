@@ -20,7 +20,7 @@ import (
 func main() {
 
 	if err := godotenv.Load(".env"); err != nil {
-		log.Println("Error loading .env file")
+		log.Println("no .env file found, using system environment variables")
 	}
 
 	cfg, err := config.Load()
@@ -33,7 +33,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	log.Println("connected to database")
 
 	userRepository := repository.NewUserRepository(db)

@@ -55,7 +55,7 @@ func (r *TicketRepository) GetAllTickets(ctx context.Context) ([]*model.Ticket, 
 	if err != nil {
 		return nil, fmt.Errorf("GetAllTickets: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	for rows.Next() {
 		ticket := &model.Ticket{}
 		if err := rows.Scan(
@@ -90,7 +90,7 @@ func (r *TicketRepository) GetTicketsByAuthorID(ctx context.Context, AuthorID in
 		return nil, fmt.Errorf("GetTicketsByAuthorID: %w", err)
 	}
 
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	for rows.Next() {
 		ticket := model.Ticket{}
 		if err := rows.Scan(

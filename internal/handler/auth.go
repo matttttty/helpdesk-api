@@ -19,7 +19,7 @@ func NewAuthHandler(userService *service.UserService) *AuthHandler {
 // Login godoc
 // POST /auth/login
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	var user model.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -47,7 +47,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 // Register godoc
 // POST /auth/register
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	var user model.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {

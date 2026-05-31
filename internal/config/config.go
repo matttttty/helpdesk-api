@@ -2,8 +2,8 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -69,8 +69,7 @@ func getEnv(key, fallback string) string {
 func mustEnv(key string) string {
 	v := os.Getenv(key)
 	if v == "" {
-		// Don't crash here - collect all missing vars in Load() if you want
-		// stricter behavior.
+		log.Fatalf("required environment variable %s is not set", key)
 	}
 	return v
 }
@@ -79,15 +78,6 @@ func getEnvDuration(key string, fallback time.Duration) time.Duration {
 	if v := os.Getenv(key); v != "" {
 		if d, err := time.ParseDuration(v); err == nil {
 			return d
-		}
-	}
-	return fallback
-}
-
-func getEnvInt(key string, fallback int) int {
-	if v := os.Getenv(key); v != "" {
-		if n, err := strconv.Atoi(v); err == nil {
-			return n
 		}
 	}
 	return fallback

@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"helpdesk-api/internal/model"
+	"helpdesk-api/pkg/middleware"
+
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
-	"helpdesk-api/pkg/middleware"
 )
 
 func NewRouter(authHandler *AuthHandler, ticketHandler *TicketHandler) *chi.Mux {
@@ -23,7 +25,11 @@ func NewRouter(authHandler *AuthHandler, ticketHandler *TicketHandler) *chi.Mux 
 			r.Post("/", ticketHandler.CreateTicket)
 			r.Get("/{id}", ticketHandler.GetTicketByID)
 			r.Put("/{id}", ticketHandler.UpdateTicket)
-			r.Delete("/{id}", ticketHandler.DeleteTicket)
+
+			r.Group(func(r chi.Router) {
+				r.Use(middleware.RequireRole(model.RoleAdmin))
+				r.Delete("/{id}", ticketHandler.DeleteTicket)
+			})
 		})
 	})
 

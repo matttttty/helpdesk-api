@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"helpdesk-api/internal/model"
 	"helpdesk-api/internal/service"
 	"helpdesk-api/pkg/middleware"
@@ -85,14 +86,14 @@ func (h *TicketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
-	var ticket *model.Ticket
+	var ticket model.Ticket
 	err = json.NewDecoder(r.Body).Decode(&ticket)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	ticket.ID = id
-	err = h.ticketService.UpdateTicket(r.Context(), ticket)
+	err = h.ticketService.UpdateTicket(r.Context(), &ticket)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "failed to update ticket", err)
 		return
@@ -115,7 +116,14 @@ func (h *TicketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 	}
 	err = h.ticketService.DeleteTicket(r.Context(), id, model.Role(claims.Role))
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to delete ticket", err)
+		switch {
+		case errors.Is(err, service.ErrAccessDenied):
+			writeError(w, http.StatusForbidden, "access denied", nil) // 403
+		case errors.Is(err, service.ErrTicketNotFound):
+			writeError(w, http.StatusNotFound, "ticket not found", nil) // 404
+		default:
+			writeError(w, http.StatusInternalServerError, "failed to delete ticket", err)
+		}
 		return
 	}
 

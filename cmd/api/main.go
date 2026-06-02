@@ -17,6 +17,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title           Helpdesk API
+// @version         1.0
+// @description     Ticket management API with JWT auth
+// @host            localhost:8080
+// @BasePath        /
+// @securityDefinitions.apikey BearerAuth
+// @in              header
+// @name            Authorization
 func main() {
 
 	if err := godotenv.Load(".env"); err != nil {

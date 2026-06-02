@@ -1,0 +1,275 @@
+basePath: /
+definitions:
+  helpdesk-api_internal_model.Priority:
+    enum:
+    - low
+    - medium
+    - high
+    - critical
+    type: string
+    x-enum-varnames:
+    - PriorityLow
+    - PriorityMedium
+    - PriorityHigh
+    - PriorityCritical
+  helpdesk-api_internal_model.Status:
+    enum:
+    - open
+    - in_progress
+    - resolved
+    - closed
+    type: string
+    x-enum-varnames:
+    - StatusOpen
+    - StatusInProgress
+    - StatusResolved
+    - StatusClosed
+  helpdesk-api_internal_model.Ticket:
+    properties:
+      assignee_id:
+        type: integer
+      author_id:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      priority:
+        $ref: '#/definitions/helpdesk-api_internal_model.Priority'
+      status:
+        $ref: '#/definitions/helpdesk-api_internal_model.Status'
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Ticket management API with JWT auth
+  title: Helpdesk API
+  version: "1.0"
+paths:
+  /tickets:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/helpdesk-api_internal_model.Ticket'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all tickets
+      tags:
+      - tickets
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Ticket payload
+        in: body
+        name: ticket
+        required: true
+        schema:
+          $ref: '#/definitions/helpdesk-api_internal_model.Ticket'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/helpdesk-api_internal_model.Ticket'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a ticket
+      tags:
+      - tickets
+  /tickets/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a ticket
+      tags:
+      - tickets
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helpdesk-api_internal_model.Ticket'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a ticket
+      tags:
+      - tickets
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Ticket payload
+        in: body
+        name: ticket
+        required: true
+        schema:
+          $ref: '#/definitions/helpdesk-api_internal_model.Ticket'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helpdesk-api_internal_model.Ticket'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a ticket
+      tags:
+      - tickets
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

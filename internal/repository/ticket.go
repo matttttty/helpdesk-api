@@ -3,8 +3,10 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"helpdesk-api/internal/model"
+	"helpdesk-api/internal/service"
 )
 
 type TicketRepository struct {
@@ -34,8 +36,8 @@ func (r *TicketRepository) GetTicketByID(ctx context.Context, id int64) (*model.
 	ticket := &model.Ticket{}
 
 	err := r.db.QueryRowContext(ctx, query, id).Scan(&ticket.ID, &ticket.Title, &ticket.Description, &ticket.Status, &ticket.Priority, &ticket.AuthorID, &ticket.AssigneeID, &ticket.CreatedAt, &ticket.UpdatedAt)
-	if err == sql.ErrNoRows {
-		return nil, nil
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, service.ErrTicketNotFound
 	}
 
 	if err != nil {
@@ -130,9 +132,18 @@ func (r *TicketRepository) UpdateTicket(ctx context.Context, ticket *model.Ticke
 func (r *TicketRepository) DeleteTicket(ctx context.Context, id int64) error {
 
 	query := `DELETE FROM tickets WHERE id = $1`
-	_, err := r.db.ExecContext(ctx, query, id)
+	res, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("DeleteTicket: %w", err)
 	}
+
+	n, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("DeleteTicket: %w", err)
+	}
+	if n == 0 {
+		return service.ErrTicketNotFound
+	}
+
 	return nil
 }

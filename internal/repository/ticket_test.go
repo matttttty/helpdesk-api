@@ -9,6 +9,7 @@ import (
 
 	"helpdesk-api/internal/model"
 	"helpdesk-api/internal/repository"
+	"helpdesk-api/internal/service"
 )
 
 func TestTicketRepository_CreateAndGet(t *testing.T) {
@@ -50,7 +51,7 @@ func TestTicketRepository_CreateAndGet(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, res)
 
-	assert.Equal(t, user.ID, res.AuthorID)
+	assert.Equal(t, got.ID, res.AuthorID)
 	assert.Equal(t, model.StatusOpen, res.Status)
 
 }
@@ -94,8 +95,15 @@ func TestTicketRepository_Delete(t *testing.T) {
 	require.NoError(t, err)
 
 	res, err := ticketRepo.GetTicketByID(ctx, ticket.ID)
-	require.NoError(t, err)
 
+	assert.ErrorIs(t, err, service.ErrTicketNotFound)
 	assert.Nil(t, res)
 
+}
+
+func TestTicketRepository_GetByID_NotFound(t *testing.T) {
+	ticketRepo := repository.NewTicketRepository(testDB)
+	res, err := ticketRepo.GetTicketByID(context.Background(), 999999)
+	assert.ErrorIs(t, err, service.ErrTicketNotFound)
+	assert.Nil(t, res)
 }
